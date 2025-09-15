@@ -42,3 +42,7 @@ export const fetchWorkouts = async (): Promise<Workout[]> => {
     route: JSON.parse(workout.route as any),
   }));
 };
+
+export const deleteWorkout = async (id: number): Promise<void> => {
+  await (await db).runAsync('DELETE FROM workouts WHERE id = ?;', [id]);
+};

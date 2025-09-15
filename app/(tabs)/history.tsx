@@ -1,7 +1,8 @@
+import { deleteWorkout, fetchWorkouts, Workout } from '@/utils/database';
+import { FontAwesome } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
-import { fetchWorkouts, Workout } from '../../utils/database';
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HistoryScreen() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -27,6 +28,30 @@ export default function HistoryScreen() {
     }, [])
   );
 
+  const handleDelete = (id: number) => {
+    Alert.alert(
+      "Подтверждение",
+      "Вы уверены, что хотите удалить эту тренировку?",
+      [
+        { text: "Отмена", style: "cancel" },
+        { 
+          text: "Удалить", 
+          onPress: async () => {
+            try {
+              await deleteWorkout(id);
+              //Фильтр чтобы быстро скрыть удалённый элемент
+              setWorkouts(prevWorkouts => prevWorkouts.filter(w => w.id !== id));
+            } catch (error) {
+              console.error("Failed to delete workout:", error);
+              Alert.alert("Ошибка", "Не удалось удалить тренировку.");
+            }
+          },
+          style: 'destructive'
+        }
+      ]
+    );
+  };
+
   if (isLoading) {
     return <ActivityIndicator style={{ flex: 1 }} size="large" />;
   }
@@ -41,6 +66,10 @@ export default function HistoryScreen() {
 
   const renderItem = ({ item }: { item: Workout }) => (
     <View style={styles.itemContainer}>
+      <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
+        <FontAwesome name="trash-o" size={24} color="#D9342B" />
+      </TouchableOpacity>
+      
       <Text style={styles.itemDate}>
         {new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' })}
       </Text>
@@ -87,9 +116,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+    paddingRight: 30, 
   },
   itemDetails: {
     fontSize: 14,
     color: '#333',
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    padding: 5,
   },
 });

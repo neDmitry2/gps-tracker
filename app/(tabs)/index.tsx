@@ -1,22 +1,22 @@
 import TrackerControls from '@/components/controls';
 import MapDisplay from '@/components/map';
+import StatsPanel from '@/components/stats';
 import { useAppSetup } from '@/hooks/useAppSetup';
-import { LocationObjectCoords } from 'expo-location';
-import React, { useState } from 'react';
+import { useLocationTracker } from '@/hooks/useLocationTracker';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function Index() {
   const { isLoading, error } = useAppSetup();
-  const [isTracking, setIsTracking] = useState(false);
-  const [route, setRoute] = useState<LocationObjectCoords[]>([]);
 
-  const handleStart = () => {
-    setIsTracking(true);
-  };
-
-  const handleStop = () => {
-    setIsTracking(false);
-  };
+  const { 
+    isTracking, 
+    route, 
+    distance, 
+    duration, 
+    startTracking, 
+    stopTracking 
+  } = useLocationTracker();
 
   if (error) {
     return (
@@ -32,9 +32,10 @@ export default function Index() {
       <MapDisplay route={route} />
       <TrackerControls 
         isTracking={isTracking}
-        onStart={handleStart}
-        onStop={handleStop}
+        onStart={startTracking}
+        onStop={stopTracking}
       />
+      {isTracking && <StatsPanel distance={distance} duration={duration} />}
     </View>
   );
 }

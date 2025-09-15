@@ -19,11 +19,17 @@ export default function MapDisplay({ route }: MapDisplayProps) {
         latitudeDelta: 0.1,
         longitudeDelta: 0.05,
       }}
+      mapPadding={{
+        top: 20,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      }}
     >
       {route.length > 1 && (
         <Polyline
           coordinates={route}
-          strokeColor="#FF0000" // Red
+          strokeColor="#FF0000"
           strokeWidth={6}
         />
       )}

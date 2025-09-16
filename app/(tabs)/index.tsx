@@ -1,4 +1,3 @@
-import TrackerControls from '@/components/controls';
 import MapDisplay from '@/components/map';
 import StatsPanel from '@/components/stats';
 import { useAppSetup } from '@/hooks/useAppSetup';
@@ -30,12 +29,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <MapDisplay route={route} />
-      <TrackerControls 
-        isTracking={isTracking}
-        onStart={startTracking}
-        onStop={stopTracking}
-      />
-      {isTracking && <StatsPanel distance={distance} duration={duration} />}
+      <StatsPanel distance={distance} duration={duration} onStart={startTracking} onStop={stopTracking} isTracking={isTracking} />
     </View>
   );
 }

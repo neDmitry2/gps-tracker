@@ -1,5 +1,5 @@
 import { LocationObjectCoords } from 'expo-location';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 
@@ -8,11 +8,30 @@ interface MapDisplayProps {
 }
 
 export default function MapDisplay({ route }: MapDisplayProps) {
+
+  const mapRef = useRef<MapView>(null);
+
+  useEffect(() => {
+    if (mapRef.current && route.length > 0) {
+      const lastCoord = route[route.length - 1];
+
+      mapRef.current.animateToRegion(
+        {
+          latitude: lastCoord.latitude,
+          longitude: lastCoord.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.005,
+        },
+        1000
+      );
+    }
+  }, [route]);
+  
   return (
     <MapView
+      ref={mapRef}
       style={styles.map}
       showsUserLocation
-      followsUserLocation
       initialRegion={{
         latitude: 56.01839,
         longitude: 92.86717,
@@ -29,7 +48,7 @@ export default function MapDisplay({ route }: MapDisplayProps) {
       {route.length > 1 && (
         <Polyline
           coordinates={route}
-          strokeColor="#FF0000"
+          strokeColor="#ff9100ff"
           strokeWidth={6}
         />
       )}

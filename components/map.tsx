@@ -5,15 +5,30 @@ import MapView, { Polyline } from 'react-native-maps';
 
 interface MapDisplayProps {
   route: LocationObjectCoords[];
-  showLocationButton?: boolean; 
+  showLocationButton?: boolean;
+  fitToRoute?: boolean;
 }
 
-export default function MapDisplay({ route, showLocationButton = true }: MapDisplayProps) {
+export default function MapDisplay({ route, showLocationButton = true, fitToRoute = false, }: MapDisplayProps) {
 
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
-    if (mapRef.current && route.length > 0) {
+    if (!mapRef.current || route.length == 0) {
+      return;
+    }
+
+    if (fitToRoute) {
+      setTimeout(() => {
+        if (mapRef.current) {
+          mapRef.current.fitToCoordinates(route, {
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+            animated: true,
+          });
+        }
+      }, 500);
+    }
+    else {
       const lastCoord = route[route.length - 1];
 
       mapRef.current.animateToRegion(
@@ -26,7 +41,7 @@ export default function MapDisplay({ route, showLocationButton = true }: MapDisp
         1000
       );
     }
-  }, [route]);
+  }, [route, fitToRoute]);
   
   return (
     <MapView

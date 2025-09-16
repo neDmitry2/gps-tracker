@@ -6,10 +6,8 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 export default function WorkoutDetailScreen() {
-  // 1. Получаем параметры, переданные при навигации
   const params = useLocalSearchParams();
 
-  // 2. "Распаковываем" данные. Они приходят как строки.
   const date = params.date as string;
   const distance = parseFloat(params.distance as string);
   const duration = parseInt(params.duration as string, 10);
@@ -25,14 +23,13 @@ export default function WorkoutDetailScreen() {
 
   return (
     <View style={styles.container}>
-      {/* 3. Устанавливаем заголовок страницы */}
       <Stack.Screen
         options={{
           title: formattedDate,
         }}
       />
       
-      <MapDisplay route={route} showLocationButton={false} />
+      <MapDisplay route={route} showLocationButton={false} fitToRoute={true} />
       <StatsPanel distance={distance} duration={duration} showButton={false}/>
     </View>
   );
@@ -45,15 +42,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   statsContainer: {
-    // Используем абсолютное позиционирование
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    // Стили для лучшей читаемости
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingTop: 10,
-    paddingBottom: 200, // Отступ снизу для safe area
+    paddingBottom: 200,
   },
 });
 

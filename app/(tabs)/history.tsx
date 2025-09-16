@@ -67,7 +67,7 @@ export default function HistoryScreen() {
   const renderItem = ({ item }: { item: Workout }) => (
     <Link 
       href={{
-        pathname: '/workout/[id]',
+        pathname: '../[id]',
         params: { 
           id: item.id,
           date: item.date,

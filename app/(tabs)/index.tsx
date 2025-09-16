@@ -29,7 +29,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <MapDisplay route={route} />
-      <StatsPanel distance={distance} duration={duration} onStart={startTracking} onStop={stopTracking} isTracking={isTracking} />
+      <StatsPanel distance={distance} duration={duration} showButton={true} onStart={startTracking} onStop={stopTracking} isTracking={isTracking} />
     </View>
   );
 }

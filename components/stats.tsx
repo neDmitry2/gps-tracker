@@ -2,14 +2,25 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import TrackerControls from './controls';
 
-type StatsPanelProps = {
+type StatsPanelPropsNoButton = {
   distance: number;
   duration: number;
+  showButton: false;
+  isTracking?: never;
+  onStart?: never;
+  onStop?: never;
+};
+
+type StatsPanelPropsButton = {
+  distance: number;
+  duration: number;
+  showButton?: true;
   isTracking: boolean;
-  showButton?: boolean;
   onStart: () => void;
   onStop: () => void;
 };
+
+type StatsPanelProps = StatsPanelPropsButton | StatsPanelPropsNoButton;
 
 // Функция для форматирования секунд в формат ММ:СС
 const formatTime = (totalSeconds: number) => {
@@ -18,29 +29,22 @@ const formatTime = (totalSeconds: number) => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export default function StatsPanel({
-  distance,
-  duration,
-  isTracking,
-  showButton = true,
-  onStart,
-  onStop,
-}: StatsPanelProps) {
+export default function StatsPanel(props: StatsPanelProps) {
   return (
     <View style={styles.statsContainer}>
       <View style={styles.statBox}>
-        <Text style={styles.statValue}>{distance.toFixed(2)}</Text>
+        <Text style={styles.statValue}>{props.distance.toFixed(2)}</Text>
         <Text style={styles.statLabel}>КМ</Text>
       </View>
-      {showButton && (
+      {props.showButton && (
         <TrackerControls
-          isTracking={isTracking}
-          onStart={onStart}
-          onStop={onStop}
+          isTracking={props.isTracking}
+          onStart={props.onStart}
+          onStop={props.onStop}
         />
       )}
       <View style={styles.statBox}>
-        <Text style={styles.statValue}>{formatTime(duration)}</Text>
+        <Text style={styles.statValue}>{formatTime(props.duration)}</Text>
         <Text style={styles.statLabel}>ВРЕМЯ</Text>
       </View>
     </View>

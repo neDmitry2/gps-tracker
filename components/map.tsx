@@ -5,9 +5,10 @@ import MapView, { Polyline } from 'react-native-maps';
 
 interface MapDisplayProps {
   route: LocationObjectCoords[];
+  showLocationButton?: boolean; 
 }
 
-export default function MapDisplay({ route }: MapDisplayProps) {
+export default function MapDisplay({ route, showLocationButton = true }: MapDisplayProps) {
 
   const mapRef = useRef<MapView>(null);
 
@@ -31,7 +32,8 @@ export default function MapDisplay({ route }: MapDisplayProps) {
     <MapView
       ref={mapRef}
       style={styles.map}
-      showsUserLocation
+      showsUserLocation = {showLocationButton}
+      showsMyLocationButton={showLocationButton}
       initialRegion={{
         latitude: 56.01839,
         longitude: 92.86717,

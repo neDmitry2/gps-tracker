@@ -32,7 +32,7 @@ export default function WorkoutDetailScreen() {
         }}
       />
       
-      <MapDisplay route={route} />
+      <MapDisplay route={route} showLocationButton={false} />
       <StatsPanel distance={distance} duration={duration} showButton={false}/>
     </View>
   );

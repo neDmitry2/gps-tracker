@@ -1,8 +1,8 @@
 import { deleteWorkout, fetchWorkouts, Workout } from '@/utils/database';
 import { FontAwesome } from '@expo/vector-icons';
-import { useFocusEffect } from 'expo-router';
+import { Link, useFocusEffect } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function HistoryScreen() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -65,21 +65,43 @@ export default function HistoryScreen() {
   }
 
   const renderItem = ({ item }: { item: Workout }) => (
-    <View style={styles.itemContainer}>
-      <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
-        <FontAwesome name="trash-o" size={24} color="#D9342B" />
-      </TouchableOpacity>
-      
-      <Text style={styles.itemDate}>
-        {new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' })}
-      </Text>
-      <Text style={styles.itemDetails}>
-        Дистанция: {item.distance.toFixed(2)} км
-      </Text>
-      <Text style={styles.itemDetails}>
-        Время: {Math.floor(item.duration / 60)} мин {item.duration % 60} сек
-      </Text>
-    </View>
+    <Link 
+      href={{
+        pathname: '/workout/[id]',
+        params: { 
+          id: item.id,
+          date: item.date,
+          distance: item.distance,
+          duration: item.duration,
+          route: JSON.stringify(item.route) 
+        }
+      }} 
+      asChild
+    >
+        <Pressable>
+            <View style={styles.itemContainer}>
+                <Pressable 
+                    onPress={(e) => {
+                    e.preventDefault();
+                    handleDelete(item.id);
+                    }} 
+                    style={styles.deleteButton}
+                >
+                    <FontAwesome name="trash-o" size={24} color="#D9342B" />
+                </Pressable>
+                
+                <Text style={styles.itemDate}>
+                    {new Date(item.date).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' })}
+                </Text>
+                <Text style={styles.itemDetails}>
+                    Дистанция: {item.distance.toFixed(2)} км
+                </Text>
+                <Text style={styles.itemDetails}>
+                    Время: {Math.floor(item.duration / 60)} мин {item.duration % 60} сек
+                </Text>
+            </View>
+        </Pressable>
+    </Link>
   );
 
   return (
@@ -127,5 +149,6 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     padding: 5,
+    zIndex: 1,
   },
 });

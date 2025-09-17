@@ -21,6 +21,8 @@ export default function WorkoutDetailScreen() {
     year: 'numeric',
   });
 
+   const initialLocation = route.length > 0 ? route[0] : null;
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -29,7 +31,7 @@ export default function WorkoutDetailScreen() {
         }}
       />
       
-      <MapDisplay route={route} showLocationButton={false} fitToRoute={true} />
+      <MapDisplay route={route} initialLocation={initialLocation} />
       <StatsPanel distance={distance} duration={duration} showButton={false}/>
     </View>
   );

@@ -6,6 +6,7 @@ import { Alert } from 'react-native';
 export const useAppSetup = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [initialLocation, setInitialLocation] = useState<Location.LocationObjectCoords | null>(null);
   
   useEffect(() => {
     const initializeApp = async () => {
@@ -14,6 +15,7 @@ export const useAppSetup = () => {
         if (status !== 'granted') {
           setError('Разрешение на доступ к местоположению было отклонено. Приложение не может работать без него.');
           setIsLoading(false);
+          return;
         }
 
         const gpsEnabled = await Location.hasServicesEnabledAsync();
@@ -27,6 +29,9 @@ export const useAppSetup = () => {
           setIsLoading(false);
           return;
         }
+        
+        const location = await Location.getCurrentPositionAsync();
+        setInitialLocation(location.coords);
 
         await initDatabase();
 
@@ -43,5 +48,5 @@ export const useAppSetup = () => {
 
   }, []);
 
-  return { isLoading, error };
+  return { isLoading, error, initialLocation };
 };

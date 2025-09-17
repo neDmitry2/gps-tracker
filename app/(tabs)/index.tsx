@@ -1,13 +1,14 @@
-import MapDisplay from '@/components/map';
+import MapDisplay, { MapDisplayRef } from '@/components/map';
 import StatsPanel from '@/components/stats';
 import { useAppSetup } from '@/hooks/useAppSetup';
 import { useLocationTracker } from '@/hooks/useLocationTracker';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useMapCenter } from '@/hooks/useMapCenter';
+import React, { useRef } from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
 
 export default function Index() {
-  const { isLoading, error } = useAppSetup();
-
+  const { isLoading, error, initialLocation } = useAppSetup();
+  
   const { 
     isTracking, 
     route, 
@@ -17,6 +18,8 @@ export default function Index() {
     stopTracking 
   } = useLocationTracker();
 
+  const mapRef = useRef<MapDisplayRef>(null);
+  const { centerMap, isCentering } = useMapCenter(mapRef as React.RefObject<MapDisplayRef>);
   if (error) {
     return (
       <View style={styles.centeredContainer}>
@@ -28,7 +31,16 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <MapDisplay route={route} />
+      <MapDisplay ref={mapRef} route={route} initialLocation={initialLocation} />
+
+      <View style={styles.centerButtonContainer}>
+        <Button 
+          title={isCentering ? "..." : "🎯"} 
+          onPress={centerMap} 
+          disabled={isCentering}
+        />
+      </View>
+
       <StatsPanel distance={distance} duration={duration} showButton={true} onStart={startTracking} onStop={stopTracking} isTracking={isTracking} />
     </View>
   );
@@ -57,5 +69,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#D9342B',
     textAlign: 'center',
+  },
+  centerButtonContainer: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    zIndex: 1,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 5,
   },
 });

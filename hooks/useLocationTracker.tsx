@@ -1,7 +1,8 @@
 import { saveWorkout } from '@/utils/database';
 import * as Location from 'expo-location';
 import haversine from 'haversine';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert } from 'react-native';
 
 // Опции для отслеживания геолокации
 const locationOptions: Location.LocationOptions = {
@@ -21,7 +22,7 @@ export const useLocationTracker = () => {
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);;
   
   // Функция для старта отслеживания
-  const startTracking = async () => {
+  const startTracking = useCallback(async () => {
     setRoute([]);
     setDistance(0);
     setDuration(0);
@@ -53,10 +54,10 @@ export const useLocationTracker = () => {
       console.error("Failed to start location tracking", error);
       setIsTracking(false);
     }
-  };
+  }, []);
 
   // Функция для остановки отслеживания
-  const stopTracking = () => {
+  const stopTracking = useCallback(() => {
     setIsTracking(false);
 
     // Отписываемся от обновлений геолокации
@@ -80,12 +81,12 @@ export const useLocationTracker = () => {
         route: route,
       };
       saveWorkout(workoutToSave)
-        .then(() => alert('Тренировка сохранена!'))
+        .then(() => Alert.alert('Успех','Тренировка сохранена!'))
         .catch(err => console.error("Failed to save workout", err));
     }
-  };
+  }, [route, distance, duration]);
   
-  // useEffect для очистки при размонтировании компонента (важно!)
+  // useEffect для очистки при размонтировании компонента
   useEffect(() => {
     return () => {
       if (locationSubscriber.current) {

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .leaflet-control-attribution {
+            display: none;
+        }
+        .current-location-icon {
+            background-color: #007AFF;
+            border: 2px solid #FFFFFF;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        const map = L.map('map').setView([56.018, 92.867], 13);
+
+        L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=pyZIDTbmIl4kG8ld1Sye', {
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+        }).addTo(map);
+
+        let polyline = null;
+        let currentLocationMarker = null;
+        const currentLocationIcon = L.divIcon({ className: 'current-location-icon', iconSize: [16, 16] });
+
+        document.addEventListener("message", function(event) {
+            try {
+                const command = JSON.parse(event.data);
+
+                switch (command.type) {
+                    case 'route':
+                        handleRouteUpdate(command.payload, command.fitToRoute);
+                        break;
+                    case 'initial':
+                        handleInitialLocation(command.payload);
+                        break;
+                    case 'center':
+                        handleCenterLocation(command.payload);
+                        break;
+                }
+            } catch (e) { }
+        });
+
+        function handleRouteUpdate(route, fitToRoute = false) {
+            if (!route || route.length === 0) return;
+            const latLngs = route.map(coord => [coord.latitude, coord.longitude]);
+            
+            if (route.length > 1) {
+                if (polyline) {
+                    polyline.setLatLngs(latLngs);
+                } else {
+                    polyline = L.polyline(latLngs, { color: '#ff9100ff', weight: 6 }).addTo(map);
+                }
+            }
+             if (fitToRoute) {
+                    map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+                }
+            
+            const currentPos = route[route.length - 1];
+            updateCurrentLocationMarker(currentPos);
+            if (!fitToRoute) {
+                map.panTo([currentPos.latitude, currentPos.longitude]);
+            }
+        }
+
+        function handleInitialLocation(location) {
+            map.setView([location.latitude, location.longitude], 15);
+            updateCurrentLocationMarker(location);
+        }
+
+        function handleCenterLocation(location) {
+            map.panTo([location.latitude, location.longitude]);
+            updateCurrentLocationMarker(location);
+        }
+
+        function updateCurrentLocationMarker(pos) {
+            if (!pos) return;
+            const latLng = [pos.latitude, pos.longitude];
+            if (currentLocationMarker) {
+                currentLocationMarker.setLatLng(latLng);
+            } else {
+                currentLocationMarker = L.marker(latLng, { icon: currentLocationIcon }).addTo(map);
+            }
+        }
+    </script>
+</body>
+</html>
